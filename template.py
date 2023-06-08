@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Author : eg
+Author : Emmanuel Gonzalez, Jeffrey Demieville, Sherali Ozodov
 Date   : 2022-10-02
-Purpose: Rock the Casbah
+Purpose: 3D Orthomosaic Generator
 """
 
 import argparse
@@ -15,7 +15,7 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description='Rock the Casbah',
+        description='3D Orthomosaic Generator',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('positional',
