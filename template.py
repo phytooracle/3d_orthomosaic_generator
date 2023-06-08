@@ -7,13 +7,13 @@ Purpose: 3D Orthomosaic Generator
 
 import argparse
 import os
+import open3d as o3d
+import numpy as np
 import sys
-
 
 # --------------------------------------------------
 def get_args():
     """Get command-line arguments"""
-
     parser = argparse.ArgumentParser(
         description='3D Orthomosaic Generator',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -57,7 +57,7 @@ def main():
 
     args = get_args()
     # Set the directory where the point clouds are stored
-    point_cloud_dir = "merged_downsampled_small"
+    point_cloud_dir = "/Users/sheraliozodov/merged_downsampled_small"
 
     # Initialize an empty list to store the point cloud files
     point_cloud_files = []
@@ -78,8 +78,8 @@ def main():
         x_offset = 409000
         y_offset = 3660000
 
-        np.asarray(pcd.points)[:,0] -= x_offset
-        np.asarray(pcd.points)[:,1] -= y_offset
+        np.asarray(pcd.points)[:, 0] -= x_offset
+        np.asarray(pcd.points)[:, 1] -= y_offset
 
         # Append
         point_clouds.append(pcd)
@@ -88,6 +88,18 @@ def main():
     merged_pcd = o3d.geometry.PointCloud()
     for pcd in point_clouds:
         merged_pcd += pcd
+
+    # Visualize the merged point cloud with real colors
+    o3d.visualization.draw_geometries([merged_pcd], point_show_normal=False)
+
+    # Adjust the camera view to show the desired perspective
+    view_control = o3d.visualization.Visualizer().get_view_control()
+    view_control.set_up([0, 0, -1])  # Set the up direction (negative Z-axis)
+    view_control.set_front([0, -1, 0])  # Set the front direction (negative Y-axis)
+    view_control.set_lookat([0, 0, 0])  # Set the look-at position
+
+    # Save the current view as an image
+    o3d.io.write_image("combined_view.png", o3d.visualization.render_point_cloud_to_image(merged_pcd))
 
 
 # --------------------------------------------------
