@@ -56,17 +56,38 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
-    str_arg = args.arg
-    int_arg = args.int
-    file_arg = args.file
-    flag_arg = args.on
-    pos_arg = args.positional
+    # Set the directory where the point clouds are stored
+    point_cloud_dir = "merged_downsampled_small"
 
-    print('str_arg = "{}"'.format(str_arg))
-    print('int_arg = "{}"'.format(int_arg))
-    print('file_arg = "{}"'.format(file_arg.name if file_arg else ''))
-    print('flag_arg = "{}"'.format(flag_arg))
-    print('positional = "{}"'.format(pos_arg))
+    # Initialize an empty list to store the point cloud files
+    point_cloud_files = []
+
+    # Recursively search for point cloud files in the specified directory and its subdirectories
+    for dirpath, dirnames, filenames in os.walk(point_cloud_dir):
+        for file in filenames:
+            if file.endswith(".ply"):
+                point_cloud_files.append(os.path.join(dirpath, file))
+
+    # Initialize an empty list to store the point clouds
+    point_clouds = []
+
+    # Load each point cloud and add it to the list
+    for file in point_cloud_files:
+        pcd = o3d.io.read_point_cloud(file)
+        # Apply offset after opening the point cloud
+        x_offset = 409000
+        y_offset = 3660000
+
+        np.asarray(pcd.points)[:,0] -= x_offset
+        np.asarray(pcd.points)[:,1] -= y_offset
+
+        # Append
+        point_clouds.append(pcd)
+
+    # Merge the point clouds into a single point cloud
+    merged_pcd = o3d.geometry.PointCloud()
+    for pcd in point_clouds:
+        merged_pcd += pcd
 
 
 # --------------------------------------------------
