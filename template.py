@@ -9,7 +9,6 @@ import argparse
 import os
 import open3d as o3d
 import numpy as np
-import sys
 
 # --------------------------------------------------
 def get_args():
@@ -18,35 +17,23 @@ def get_args():
         description='3D Orthomosaic Generator',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('positional',
-                        metavar='str',
-                        help='A positional argument')
+    parser.add_argument('directory',
+                        metavar='directory',
+                        help='Directory path to the point clouds')
 
-    parser.add_argument('-a',
-                        '--arg',
-                        help='A named string argument',
-                        metavar='str',
-                        type=str,
-                        default='')
-
-    parser.add_argument('-i',
-                        '--int',
-                        help='A named integer argument',
-                        metavar='int',
+    parser.add_argument('-w',
+                        '--width',
+                        help='Image width',
+                        metavar='width',
                         type=int,
-                        default=0)
+                        default=800)
 
-    parser.add_argument('-f',
-                        '--file',
-                        help='A readable file',
-                        metavar='FILE',
-                        type=argparse.FileType('r'),
-                        default=None)
-
-    parser.add_argument('-o',
-                        '--on',
-                        help='A boolean flag',
-                        action='store_true')
+    parser.add_argument('-H',
+                        '--height',
+                        help='Image height',
+                        metavar='height',
+                        type=int,
+                        default=600)
 
     return parser.parse_args()
 
@@ -56,8 +43,9 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
+
     # Set the directory where the point clouds are stored
-    point_cloud_dir = "/Users/sheraliozodov/merged_downsampled_small"
+    point_cloud_dir = args.directory
 
     # Initialize an empty list to store the point cloud files
     point_cloud_files = []
@@ -99,7 +87,9 @@ def main():
     view_control.set_lookat([0, 0, 0])  # Set the look-at position
 
     # Save the current view as an image
-    o3d.io.write_image("combined_view.png", o3d.visualization.render_point_cloud_to_image(merged_pcd))
+    image_width = args.width
+    image_height = args.height
+    o3d.io.write_image("combined_view.png", o3d.visualization.render_point_cloud_to_image(merged_pcd, width=image_width, height=image_height))
 
 
 # --------------------------------------------------
