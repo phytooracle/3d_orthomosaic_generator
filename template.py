@@ -64,6 +64,13 @@ def main():
     min_bound = merged_pcd.get_min_bound()
     max_bound = merged_pcd.get_max_bound()
 
+    # Calculate the size of the bounding box
+    size_x = max_bound[0] - min_bound[0]
+    size_y = max_bound[1] - min_bound[1]
+
+    # Calculate the aspect ratio
+    aspect_ratio = size_x / size_y
+
     # Extract points and colors
     points = np.asarray(merged_pcd.points)
     colors = np.asarray(merged_pcd.colors)
@@ -89,9 +96,13 @@ def main():
     max_image_size = 500000  # max number of pixels in the image
     scale_factor = max_image_size / len(points)
 
-    # Set the width and height based on the scale factor
-    width = int(np.sqrt(len(points) * scale_factor))
-    height = int(np.sqrt(len(points) * scale_factor))
+    # Set the width and height based on the scale factor and the aspect ratio
+    if aspect_ratio >= 1:
+        width = int(np.sqrt(max_image_size * aspect_ratio))
+        height = int(np.sqrt(max_image_size / aspect_ratio))
+    else:
+        width = int(np.sqrt(max_image_size / aspect_ratio))
+        height = int(np.sqrt(max_image_size * aspect_ratio))
 
     # Transform points to pixel coordinates
     x_pixels = np.floor(((points[:, 0] - min_bound[0]) / (max_bound[0] - min_bound[0])) * (width - 1)).astype(int)
@@ -114,7 +125,6 @@ def main():
 
     print(f"Image saved to {output_file}")
 
-    # --------------------------------------------------
-
+# --------------------------------------------------
 if __name__ == '__main__':
     main()
