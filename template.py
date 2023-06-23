@@ -4,6 +4,7 @@ import open3d as o3d
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # --------------------------------------------------
 def get_args():
     """Get command-line arguments"""
@@ -15,21 +16,8 @@ def get_args():
                         metavar='directory',
                         help='Directory path to the point clouds')
 
-    parser.add_argument('-w',
-                        '--width',
-                        help='Image width',
-                        metavar='width',
-                        type=int,
-                        default=800)
-
-    parser.add_argument('-H',
-                        '--height',
-                        help='Image height',
-                        metavar='height',
-                        type=int,
-                        default=600)
-
     return parser.parse_args()
+
 
 # --------------------------------------------------
 def main():
@@ -80,16 +68,45 @@ def main():
     points = np.asarray(merged_pcd.points)
     colors = np.asarray(merged_pcd.colors)
 
+    # Handle situation where no color data is available.
+    if len(colors) == 0:
+        # Extract z-coordinates
+        z_coords = points[:, 2]
+
+        # Normalize z-coordinates to range 0-1
+        normalized_z = (z_coords - np.min(z_coords)) / (np.max(z_coords) - np.min(z_coords))
+
+        # Generate a colormap
+        cmap = plt.get_cmap('jet')  # 'jet' is a commonly used colormap for heightmaps
+
+        # Assign colors based on normalized z-coordinates
+        colors = cmap(normalized_z)
+
+        # Ignore alpha channel
+        colors = colors[:, :3]
+
+    # Determine the scale factor for the image size
+    max_image_size = 500000  # max number of pixels in the image
+    scale_factor = max_image_size / len(points)
+
+    # Set the width and height based on the scale factor
+    width = int(np.sqrt(len(points) * scale_factor))
+    height = int(np.sqrt(len(points) * scale_factor))
+
     # Transform points to pixel coordinates
-    x_pixels = np.floor(((points[:, 0] - min_bound[0]) / (max_bound[0] - min_bound[0])) * (args.width - 1)).astype(int)
-    y_pixels = np.floor(((points[:, 1] - min_bound[1]) / (max_bound[1] - min_bound[1])) * (args.height - 1)).astype(int)
+    x_pixels = np.floor(((points[:, 0] - min_bound[0]) / (max_bound[0] - min_bound[0])) * (width - 1)).astype(int)
+    y_pixels = np.floor(((points[:, 1] - min_bound[1]) / (max_bound[1] - min_bound[1])) * (height - 1)).astype(int)
 
     # Create blank image
-    image = np.zeros((args.height, args.width, 3), dtype=np.uint8)
+    image = np.zeros((height, width, 3), dtype=np.uint8)
+
+    print(f"Colors size: {len(colors)}")
+    print(f"X_pixels size: {len(x_pixels)}")
+    print(f"Y_pixels size: {len(y_pixels)}")
 
     # Assign colors to pixels
     for i in range(len(points)):
-        image[int(y_pixels[i]), int(x_pixels[i])] = colors[i] * 255
+        image[int(y_pixels[i]), int(x_pixels[i])] = (colors[i] * 255).astype(np.uint8)
 
     # Save image
     output_file = "/Users/sheraliozodov/phyto_oracle/3d_orthomosaic_generator/combined_view.png"
@@ -97,6 +114,7 @@ def main():
 
     print(f"Image saved to {output_file}")
 
-# --------------------------------------------------
+    # --------------------------------------------------
+
 if __name__ == '__main__':
     main()
