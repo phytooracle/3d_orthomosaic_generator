@@ -120,7 +120,7 @@ def main():
         image[int(y_pixels[i]), int(x_pixels[i])] = (colors[i] * 255).astype(np.uint8)
 
     # Save image
-    output_file = "/Users/sheraliozodov/phyto_oracle/3d_orthomosaic_generator/combined_view.png"
+    output_file = "./combined_view.png"
     plt.imsave(output_file, image)
 
     print(f"Image saved to {output_file}")
