@@ -92,17 +92,17 @@ def main():
         # Ignore alpha channel
         colors = colors[:, :3]
 
-    # Determine the scale factor for the image size
-    max_image_size = 500000  # max number of pixels in the image
-    scale_factor = max_image_size / len(points)
+    # Determine the max image size
+    scale_factor = 1
+    max_image_size = max(width, height) * scale_factor
 
     # Set the width and height based on the scale factor and the aspect ratio
     if aspect_ratio >= 1:
-        width = int(np.sqrt(max_image_size * aspect_ratio))
-        height = int(np.sqrt(max_image_size / aspect_ratio))
+        width = int(max_image_size / np.sqrt(aspect_ratio))
+        height = int(max_image_size / np.sqrt(aspect_ratio))
     else:
-        width = int(np.sqrt(max_image_size / aspect_ratio))
-        height = int(np.sqrt(max_image_size * aspect_ratio))
+        width = int(max_image_size * np.sqrt(aspect_ratio))
+        height = int(max_image_size * np.sqrt(aspect_ratio))
 
     # Transform points to pixel coordinates
     x_pixels = np.floor(((points[:, 0] - min_bound[0]) / (max_bound[0] - min_bound[0])) * (width - 1)).astype(int)
