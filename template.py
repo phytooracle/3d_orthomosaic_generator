@@ -94,7 +94,7 @@ def main():
 
     # Determine the max image size
     scale_factor = 1
-    max_image_size = max(width, height) * scale_factor
+    max_image_size = max(size_x, size_y) * scale_factor
 
     # Set the width and height based on the scale factor and the aspect ratio
     if aspect_ratio >= 1:
