@@ -93,7 +93,7 @@ def main():
         colors = colors[:, :3]
 
     # Determine the max image size
-    scale_factor = 5
+    scale_factor = 10
     max_image_size = max(size_x, size_y) * scale_factor
 
     # Set the width and height based on the scale factor and the aspect ratio
